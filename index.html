@@ -7,17 +7,24 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.js"></script>
+    
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
     <style>
       body {
         font-family: 'Inter', sans-serif;
         background-color: #050505;
         color: #f5f5f4;
+        margin: 0;
+        padding: 0;
       }
       h1, h2, h3, h4, h5, h6 {
         font-family: 'Playfair Display', serif;
@@ -35,18 +42,6 @@
       }
       ::-webkit-scrollbar-thumb:hover {
         background: #d4af37;
-      }
-      .gold-text {
-        background: linear-gradient(to right, #fbbf24, #d4af37, #fbbf24);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-size: 200% auto;
-        animation: shine-text 4s linear infinite;
-      }
-      @keyframes shine-text {
-        to {
-          background-position: 200% center;
-        }
       }
       .glass-panel {
         background: rgba(10, 10, 10, 0.6);
@@ -180,37 +175,22 @@
       .delay-500 { transition-delay: 500ms; }
       .delay-700 { transition-delay: 700ms; }
     </style>
-
-    <script type="importmap">
-    {
-      "imports": {
-        "react": "https://esm.sh/react@18.2.0",
-        "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
-        "lucide-react": "https://esm.sh/lucide-react@0.292.0",
-        "@google/genai": "https://esm.sh/@google/genai@0.1.1"
-      }
-    }
-    </script>
   </head>
   <body>
     <div id="root"></div>
 
-    <script type="text/babel" data-type="module">
-      import React, { useState, useEffect, useRef } from 'react';
-      import { createRoot } from 'react-dom/client';
-      import { 
+    <script type="text/babel">
+      // --- GLOBALS (NO IMPORTS) ---
+      const { useState, useEffect, useRef } = React;
+      const { createRoot } = ReactDOM;
+      // Get Icons from the global 'lucideReact' object
+      const { 
         Menu, X, Phone, MessageSquare, Send, Sparkles, ArrowRight, ChevronDown, 
         Home, Coffee, ShoppingBag, ArrowUpRight, MapPin, Check, Star, Quote, 
         Instagram, Facebook, Linkedin, Mail 
-      } from 'lucide-react';
-      import { GoogleGenAI } from '@google/genai';
+      } = lucideReact;
 
       // --- CONFIG & DATA ---
-      // Polyfill for process.env
-      if (!window.process) {
-        window.process = { env: { API_KEY: '' } };
-      }
-
       const COMPANY_DETAILS = {
         name: "ADA Studios",
         tagline: "Bespoke Living Solutions",
@@ -318,48 +298,11 @@
         { title: "Execution & Delivery", desc: "Precision crafting and handover." }
       ];
 
-      // --- GEMINI SERVICE ---
-      let aiClient = null;
-
-      const getClient = () => {
-        if (!aiClient) {
-          const apiKey = process.env.API_KEY;
-          if (!apiKey) {
-            console.warn("API Key not found in process.env.API_KEY");
-          }
-          aiClient = new GoogleGenAI({ apiKey: apiKey || 'dummy_key' });
-        }
-        return aiClient;
-      };
-
+      // --- MOCK AI SERVICE (To prevent crash without API Key) ---
       const generateDesignAdvice = async (userQuery) => {
-        try {
-          const ai = getClient();
-          const systemPrompt = `
-            You are the AI Design Consultant for ${COMPANY_DETAILS.name}, a luxury interior design studio in Mumbai.
-            Tagline: ${COMPANY_DETAILS.tagline}.
-            Experience: ${COMPANY_DETAILS.experience} years.
-            Services: ${SERVICES.map(s => s.title).join(", ")}.
-            
-            Your Role:
-            1. Answer questions about interior design trends, color palettes, and space planning.
-            2. Maintain a sophisticated, professional, and artistic tone.
-            3. If asked about booking or pricing, refer them to email ${COMPANY_DETAILS.email} or phone ${COMPANY_DETAILS.phone}.
-            4. Keep answers concise (under 100 words) but elegant.
-            
-            User Query: ${userQuery}
-          `;
-
-          const response = await ai.models.generateContent({
-            model: "gemini-2.0-flash",
-            contents: systemPrompt,
-          });
-
-          return response.text || "I apologize, I am currently unable to provide design advice. Please contact our studio directly.";
-        } catch (error) {
-          console.error("Gemini API Error:", error);
-          return "Our AI consultant is momentarily unavailable. Please try again later.";
-        }
+        // Simulating API delay
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        return "Thank you for your query. As this is a demo version, live AI generation is currently paused. However, our design team would love to discuss '" + userQuery + "' with you personally. Please use the contact form below.";
       };
 
       // --- COMPONENTS ---
